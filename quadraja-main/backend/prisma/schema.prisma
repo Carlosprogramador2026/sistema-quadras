@@ -1,0 +1,80 @@
+// Schema do sistema de agendamento de quadra de futebol.
+// Provider: SQLite para desenvolvimento local (sem Docker/credenciais).
+// Para migrar para PostgreSQL depois: troque o provider para "postgresql",
+// ajuste a DATABASE_URL e rode `prisma migrate dev`.
+//
+// Observacao: SQLite nao suporta enum nativo. O campo `status` da Reserva
+// e uma String validada no backend (Zod) com os valores:
+// PENDENTE | CONFIRMADA | CANCELADA | EM_ESPERA.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Gestor {
+  id        Int      @id @default(autoincrement())
+  nome      String
+  email     String   @unique
+  senha     String
+  whatsapp  String
+  createdAt DateTime @default(now())
+}
+
+model Cliente {
+  id          Int           @id @default(autoincrement())
+  nome        String
+  telefone    String
+  email       String        @unique
+  senha       String
+  createdAt   DateTime      @default(now())
+  reservas    Reserva[]
+  listaEspera ListaEspera[]
+}
+
+model Quadra {
+  id          Int           @id @default(autoincrement())
+  nome        String
+  ativa       Boolean       @default(true)
+  createdAt   DateTime      @default(now())
+  reservas    Reserva[]
+  listaEspera ListaEspera[]
+}
+
+model Reserva {
+  id         Int      @id @default(autoincrement())
+  cliente    Cliente  @relation(fields: [clienteId], references: [id])
+  clienteId  Int
+  quadra     Quadra   @relation(fields: [quadraId], references: [id])
+  quadraId   Int
+  data       String // "YYYY-MM-DD"
+  horaInicio String // "HH:mm"
+  horaFim    String // "HH:mm"
+  status     String   @default("PENDENTE")
+  createdAt  DateTime @default(now())
+
+  @@index([quadraId, data])
+  @@index([status])
+  @@index([clienteId])
+}
+
+model ListaEspera {
+  id         Int      @id @default(autoincrement())
+  cliente    Cliente  @relation(fields: [clienteId], references: [id])
+  clienteId  Int
+  quadra     Quadra   @relation(fields: [quadraId], references: [id])
+  quadraId   Int
+  data       String // "YYYY-MM-DD"
+  horaInicio String // "HH:mm"
+  horaFim    String // "HH:mm"
+  posicao    Int
+  notificado Boolean  @default(false)
+  createdAt  DateTime @default(now())
+
+  @@index([quadraId, data, horaInicio])
+  @@index([clienteId])
+}
