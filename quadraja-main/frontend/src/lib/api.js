@@ -1,8 +1,10 @@
 import axios from 'axios';
 
-// Usa caminho relativo: o Vite faz proxy de /api para o backend (porta 3333).
+// Em dev, usa caminho relativo (o Vite faz proxy de /api para o backend).
+// Em producao (front e back em dominios separados), defina VITE_API_URL
+// com a URL completa da API, ex: https://quadra-backend.onrender.com/api
 export const api = axios.create({
-  baseURL: '/api',
+  baseURL: import.meta.env.VITE_API_URL || '/api',
 });
 
 const STORAGE_KEY = 'quadra.auth';
