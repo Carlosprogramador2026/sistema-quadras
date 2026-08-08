@@ -1,4 +1,5 @@
 import { useEffect, useState, useCallback } from 'react';
+import { Link } from 'react-router-dom';
 import { api, mensagemErro } from '../../lib/api.js';
 import { hoje, formatarDataLonga, statusMeta } from '../../lib/format.js';
 import { Card, CardBody } from '../../components/ui/Card.jsx';
@@ -105,7 +106,7 @@ export function VisaoGeral() {
             return (
               <Card key={r.id}>
                 <div className="flex items-center justify-between gap-4 p-4 sm:p-5">
-                  <div className="flex items-center gap-4">
+                  <Link to={`/admin/reservas/${r.id}`} className="flex items-center gap-4 hover:underline">
                     <div className="text-center">
                       <p className="text-lg font-extrabold tabular-nums text-slate-900">{r.horaInicio}</p>
                       <p className="text-[11px] text-slate-400">{r.horaFim}</p>
@@ -117,7 +118,7 @@ export function VisaoGeral() {
                         {r.cliente?.nome} · {r.cliente?.telefone}
                       </p>
                     </div>
-                  </div>
+                  </Link>
                   <div className="flex items-center gap-3">
                     <Badge color={meta.badge}>{meta.label}</Badge>
                     {podeCancelar(r.status) && (

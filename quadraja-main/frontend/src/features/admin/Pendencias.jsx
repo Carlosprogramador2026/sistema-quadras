@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { api, mensagemErro } from '../../lib/api.js';
 import { formatarDataLonga } from '../../lib/format.js';
 import { Card } from '../../components/ui/Card.jsx';
@@ -56,7 +57,7 @@ export function Pendencias() {
           {reservas.map((r) => (
             <Card key={r.id}>
               <div className="flex flex-col gap-4 p-4 sm:flex-row sm:items-center sm:justify-between sm:p-5">
-                <div>
+                <Link to={`/admin/reservas/${r.id}`} className="hover:underline">
                   <p className="font-bold text-slate-900">{r.quadra?.nome}</p>
                   <p className="text-sm text-slate-500">
                     {formatarDataLonga(r.data)} · {r.horaInicio}–{r.horaFim}
@@ -64,7 +65,7 @@ export function Pendencias() {
                   <p className="mt-1 text-sm text-slate-600">
                     👤 {r.cliente?.nome} · 📱 {r.cliente?.telefone}
                   </p>
-                </div>
+                </Link>
                 <div className="flex gap-2">
                   <Button
                     variant="outline"

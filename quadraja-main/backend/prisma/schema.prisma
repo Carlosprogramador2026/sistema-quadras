@@ -34,15 +34,18 @@ model Cliente {
   createdAt   DateTime      @default(now())
   reservas    Reserva[]
   listaEspera ListaEspera[]
+  reservasRecorrentes ReservaRecorrente[]
 }
 
 model Quadra {
   id          Int           @id @default(autoincrement())
   nome        String
   ativa       Boolean       @default(true)
+  valorHora   Float         @default(0)
   createdAt   DateTime      @default(now())
   reservas    Reserva[]
   listaEspera ListaEspera[]
+  reservasRecorrentes ReservaRecorrente[]
 }
 
 model Reserva {
@@ -55,11 +58,21 @@ model Reserva {
   horaInicio String // "HH:mm"
   horaFim    String // "HH:mm"
   status     String   @default("PENDENTE")
+  valor      Float    @default(0) // snapshot de quadra.valorHora (pos-desconto) no momento da criacao
   createdAt  DateTime @default(now())
+
+  participantes Participante[]
+
+  cupom   Cupom? @relation(fields: [cupomId], references: [id])
+  cupomId Int?
+
+  reservaRecorrente   ReservaRecorrente? @relation(fields: [reservaRecorrenteId], references: [id])
+  reservaRecorrenteId Int?
 
   @@index([quadraId, data])
   @@index([status])
   @@index([clienteId])
+  @@index([reservaRecorrenteId])
 }
 
 model ListaEspera {
@@ -77,4 +90,55 @@ model ListaEspera {
 
   @@index([quadraId, data, horaInicio])
   @@index([clienteId])
+}
+
+// Participante de uma reserva (lista de presenca + rateio + sorteio de times).
+// Entrada simples (nome/telefone) gerida pelo dono da reserva, nao e conta de usuario.
+model Participante {
+  id         Int      @id @default(autoincrement())
+  reserva    Reserva  @relation(fields: [reservaId], references: [id])
+  reservaId  Int
+  nome       String
+  telefone   String?
+  confirmado Boolean  @default(false)
+  pago       Boolean  @default(false)
+  time       Int? // 1 ou 2 apos o sorteio; null antes de sortear
+  createdAt  DateTime @default(now())
+
+  @@index([reservaId])
+}
+
+// Cupom de desconto aplicavel na criacao de uma reserva avulsa.
+// SQLite nao tem enum nativo: `tipo` e String validada no backend (PERCENTUAL | FIXO).
+model Cupom {
+  id          Int       @id @default(autoincrement())
+  codigo      String    @unique
+  tipo        String
+  valor       Float
+  ativo       Boolean   @default(true)
+  validoAte   String? // "YYYY-MM-DD"
+  usosMaximos Int?
+  usosCount   Int       @default(0)
+  createdAt   DateTime  @default(now())
+  reservas    Reserva[]
+}
+
+// Reserva recorrente (mensalista): fixa o mesmo horario toda semana.
+// Materializa reservas reais (Reserva.reservaRecorrenteId) em vez de gerar sob demanda,
+// ja que o projeto nao tem infraestrutura de cron/scheduler.
+model ReservaRecorrente {
+  id         Int      @id @default(autoincrement())
+  cliente    Cliente  @relation(fields: [clienteId], references: [id])
+  clienteId  Int
+  quadra     Quadra   @relation(fields: [quadraId], references: [id])
+  quadraId   Int
+  diaSemana  Int // 0=domingo ... 6=sabado (convencao dayjs().day())
+  horaInicio String
+  horaFim    String
+  ativo      Boolean  @default(true)
+  createdAt  DateTime @default(now())
+  reservas   Reserva[]
+
+  @@index([clienteId])
+  @@index([quadraId])
 }

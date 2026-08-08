@@ -73,7 +73,7 @@ export function Horarios() {
     }
   }
 
-  const quadraNome = quadras.find((q) => String(q.id) === String(quadraId))?.nome;
+  const quadraAtual = quadras.find((q) => String(q.id) === String(quadraId));
 
   return (
     <div className="space-y-6">
@@ -152,7 +152,7 @@ export function Horarios() {
               <p className="font-bold text-slate-900">
                 {selecionado.horaInicio}–{selecionado.horaFim}
               </p>
-              <p className="text-slate-500">{quadraNome}</p>
+              <p className="text-slate-500">{quadraAtual?.nome}</p>
             </div>
             {selecionado.disponivel ? (
               <Button onClick={() => setModalAberto(true)}>Reservar este horário</Button>
@@ -168,8 +168,7 @@ export function Horarios() {
       <ConfirmarReservaModal
         open={modalAberto}
         onClose={() => setModalAberto(false)}
-        quadraId={quadraId}
-        quadraNome={quadraNome}
+        quadra={quadraAtual}
         data={data}
         slot={selecionado}
         onConfirmado={() => {

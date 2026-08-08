@@ -1,14 +1,19 @@
 import { reservaRepository } from '../repositories/reservaRepository.js';
+import { participanteRepository } from '../repositories/participanteRepository.js';
 import { quadraService } from './quadraService.js';
 import { listaEsperaService } from './listaEsperaService.js';
+import { cupomService } from './cupomService.js';
 import { AppError } from '../utils/AppError.js';
-import { StatusReserva, STATUS_OCUPADOS } from '../utils/constants.js';
+import { StatusReserva, STATUS_OCUPADOS, Role } from '../utils/constants.js';
 import { slotNoPassado } from '../utils/dates.js';
 import { linkSolicitacaoReserva } from '../utils/whatsapp.js';
 
 export const reservaService = {
   // Cliente solicita uma reserva (entra como PENDENTE).
-  async criar({ clienteId, quadraId, data, horaInicio, horaFim }) {
+  // cupomCodigo e reservaRecorrenteId sao internos: nunca chegam pelo POST /reservas
+  // publico (o Zod schema da rota nao declara reservaRecorrenteId), so via
+  // reservaRecorrenteService ao materializar as ocorrencias de uma recorrencia.
+  async criar({ clienteId, quadraId, data, horaInicio, horaFim, cupomCodigo, reservaRecorrenteId }) {
     const quadra = await quadraService.buscarOuFalhar(quadraId);
     if (!quadra.ativa) throw new AppError('Esta quadra nao esta disponivel.', 409);
 
@@ -30,6 +35,13 @@ export const reservaService = {
       );
     }
 
+    let valor = quadra.valorHora;
+    let cupomAplicado = null;
+    if (cupomCodigo) {
+      cupomAplicado = await cupomService.validar({ codigo: cupomCodigo, valorBase: valor });
+      valor = cupomAplicado.valorFinal;
+    }
+
     const reserva = await reservaRepository.criar({
       clienteId,
       quadraId,
@@ -37,7 +49,12 @@ export const reservaService = {
       horaInicio,
       horaFim,
       status: StatusReserva.PENDENTE,
+      valor,
+      cupomId: cupomAplicado?.cupom.id ?? null,
+      reservaRecorrenteId: reservaRecorrenteId ?? null,
     });
+
+    if (cupomAplicado) await cupomService.incrementarUso(cupomAplicado.cupom.id);
 
     const whatsappUrl = linkSolicitacaoReserva({
       cliente: reserva.cliente,
@@ -69,6 +86,24 @@ export const reservaService = {
     const reserva = await reservaRepository.buscarPorId(id);
     if (!reserva) throw new AppError('Reserva nao encontrada.', 404);
     return reserva;
+  },
+
+  // Detalhe de uma reserva: dados + participantes + rateio do valor entre os confirmados.
+  async detalhar(id, { clienteId, role }) {
+    const reserva = await reservaService.buscarOuFalhar(id);
+    if (role === Role.CLIENTE && reserva.clienteId !== clienteId) {
+      throw new AppError('Voce nao pode ver esta reserva.', 403);
+    }
+
+    const participantes = await participanteRepository.listarPorReserva(id);
+    const confirmados = participantes.filter((p) => p.confirmado);
+    const valorPorPessoa = confirmados.length ? reserva.valor / confirmados.length : reserva.valor;
+
+    return {
+      reserva,
+      participantes,
+      rateio: { valorTotal: reserva.valor, confirmados: confirmados.length, valorPorPessoa },
+    };
   },
 
   // Gestor confirma uma reserva pendente.

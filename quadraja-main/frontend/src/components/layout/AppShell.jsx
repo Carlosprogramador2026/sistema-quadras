@@ -6,6 +6,7 @@ import { useAuth } from '../../lib/auth.jsx';
 const navItens = [
   { to: '/', label: 'Reservar', end: true },
   { to: '/minhas-reservas', label: 'Minhas reservas' },
+  { to: '/recorrentes', label: 'Mensalista' },
 ];
 
 // Shell do cliente: navbar no topo (sem sidebar), conteudo centralizado.

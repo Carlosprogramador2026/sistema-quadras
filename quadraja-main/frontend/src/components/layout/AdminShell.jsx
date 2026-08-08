@@ -13,6 +13,7 @@ const navItens = [
   { to: '/admin/pendencias', label: 'Pendências', icon: 'M12 8v4l3 3M21 12a9 9 0 11-18 0 9 9 0 0118 0z' },
   { to: '/admin/visao-geral', label: 'Agenda', icon: 'M8 2v4M16 2v4M3 10h18M5 6h14a2 2 0 012 2v12a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2z' },
   { to: '/admin/quadras', label: 'Quadras', icon: 'M4 5h16v14H4zM12 5v14M4 9h4M4 15h4M16 9h4M16 15h4' },
+  { to: '/admin/cupons', label: 'Cupons', icon: 'M20 12v6a2 2 0 01-2 2H6a2 2 0 01-2-2v-6M2 7h20M12 3l4 4-4 4-4-4z' },
 ];
 
 function ItemLink({ item, mobile }) {

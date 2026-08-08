@@ -1,4 +1,5 @@
 import { reservaService } from '../services/reservaService.js';
+import { participanteService } from '../services/participanteService.js';
 import { asyncHandler } from '../utils/asyncHandler.js';
 import { Role } from '../utils/constants.js';
 
@@ -26,6 +27,14 @@ export const reservaController = {
     res.json(resumo);
   }),
 
+  detalhar: asyncHandler(async (req, res) => {
+    const resultado = await reservaService.detalhar(req.params.id, {
+      clienteId: req.user.id,
+      role: req.user.role,
+    });
+    res.json(resultado);
+  }),
+
   confirmar: asyncHandler(async (req, res) => {
     const reserva = await reservaService.confirmar(req.params.id);
     res.json(reserva);
@@ -39,5 +48,13 @@ export const reservaController = {
   cancelar: asyncHandler(async (req, res) => {
     const result = await reservaService.cancelar(req.params.id);
     res.json(result);
+  }),
+
+  sortear: asyncHandler(async (req, res) => {
+    const participantes = await participanteService.sortear({
+      reservaId: req.params.id,
+      ator: { id: req.user.id, role: req.user.role },
+    });
+    res.json(participantes);
   }),
 };

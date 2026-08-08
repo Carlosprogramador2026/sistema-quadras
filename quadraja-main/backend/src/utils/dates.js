@@ -40,3 +40,18 @@ export function slotNoPassado(data, horaInicio) {
   const inicio = dayjs(`${data} ${horaInicio}`, `${FORMATO_DATA} ${FORMATO_HORA}`, true);
   return inicio.isValid() && inicio.isBefore(dayjs());
 }
+
+// Proximas N datas (incluindo hoje) que caem no dia da semana informado
+// (convencao dayjs().day(): 0=domingo ... 6=sabado), uma por semana.
+export function proximasDatasDoDiaSemana(diaSemana, quantidade) {
+  let atual = dayjs();
+  while (atual.day() !== diaSemana) {
+    atual = atual.add(1, 'day');
+  }
+  const datas = [];
+  for (let i = 0; i < quantidade; i++) {
+    datas.push(atual.format(FORMATO_DATA));
+    atual = atual.add(7, 'day');
+  }
+  return datas;
+}

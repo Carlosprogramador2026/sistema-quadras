@@ -25,6 +25,22 @@ export function linkSolicitacaoReserva({ cliente, quadra, data, horaInicio, hora
   return buildWhatsappUrl(GESTOR_WHATSAPP, mensagem);
 }
 
+const DIAS_SEMANA = ['Domingo', 'Segunda-feira', 'Terca-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sabado'];
+
+// Link para o CLIENTE avisar o GESTOR de uma nova recorrencia (mensalista).
+// Um unico link resume todas as ocorrencias ja criadas, em vez de um link por semana.
+export function linkSolicitacaoRecorrente({ cliente, quadra, diaSemana, horaInicio, horaFim, quantidade }) {
+  const mensagem =
+    `Ola! Gostaria de reservar um horario fixo (mensalista).\n\n` +
+    `*Quadra:* ${quadra.nome}\n` +
+    `*Dia:* Toda ${DIAS_SEMANA[diaSemana]}\n` +
+    `*Horario:* ${horaInicio} as ${horaFim}\n` +
+    `*Cliente:* ${cliente.nome}\n` +
+    `*Telefone:* ${cliente.telefone}\n\n` +
+    `(Ja reservei ${quantidade} data(s) pelo sistema.)`;
+  return buildWhatsappUrl(GESTOR_WHATSAPP, mensagem);
+}
+
 // Link para o GESTOR avisar um CLIENTE da lista de espera que vagou horario.
 export function linkVagaLiberada({ cliente, quadra, data, horaInicio, horaFim }) {
   const mensagem =

@@ -49,17 +49,19 @@ export function MinhasReservas() {
           {reservas.map((r) => {
             const meta = statusMeta(r.status);
             return (
-              <Card key={r.id}>
-                <div className="flex items-center justify-between gap-4 p-4 sm:p-5">
-                  <div>
-                    <p className="font-bold text-slate-900">{r.quadra?.nome}</p>
-                    <p className="text-sm text-slate-500">
-                      {formatarDataLonga(r.data)} · {r.horaInicio}–{r.horaFim}
-                    </p>
+              <Link key={r.id} to={`/minhas-reservas/${r.id}`} className="block">
+                <Card>
+                  <div className="flex items-center justify-between gap-4 p-4 sm:p-5">
+                    <div>
+                      <p className="font-bold text-slate-900">{r.quadra?.nome}</p>
+                      <p className="text-sm text-slate-500">
+                        {formatarDataLonga(r.data)} · {r.horaInicio}–{r.horaFim}
+                      </p>
+                    </div>
+                    <Badge color={meta.badge}>{meta.label}</Badge>
                   </div>
-                  <Badge color={meta.badge}>{meta.label}</Badge>
-                </div>
-              </Card>
+                </Card>
+              </Link>
             );
           })}
         </div>

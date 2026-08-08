@@ -15,16 +15,20 @@ export const DATA_FUTURA = '2099-12-31';
 // Monta o header de autenticacao Bearer.
 export const auth = (token) => ({ Authorization: `Bearer ${token}` });
 
-// Apaga todos os dados respeitando a ordem das chaves estrangeiras.
+// Apaga todos os dados respeitando a ordem das chaves estrangeiras
+// (filhos antes de pais).
 export async function resetarBanco() {
-  await prisma.reserva.deleteMany();
+  await prisma.participante.deleteMany();
   await prisma.listaEspera.deleteMany();
+  await prisma.reserva.deleteMany();
+  await prisma.reservaRecorrente.deleteMany();
+  await prisma.cupom.deleteMany();
   await prisma.cliente.deleteMany();
   await prisma.quadra.deleteMany();
   await prisma.gestor.deleteMany();
 }
 
-// Cria um gestor (senha "admin123") e uma quadra ativa para os testes.
+// Cria um gestor (senha "admin123") e uma quadra ativa (com preco) para os testes.
 export async function semearBase() {
   const gestor = await prisma.gestor.create({
     data: {
@@ -34,7 +38,9 @@ export async function semearBase() {
       whatsapp: '5511999990000',
     },
   });
-  const quadra = await prisma.quadra.create({ data: { nome: 'Quadra Teste', ativa: true } });
+  const quadra = await prisma.quadra.create({
+    data: { nome: 'Quadra Teste', ativa: true, valorHora: 100 },
+  });
   return { gestor, quadra };
 }
 

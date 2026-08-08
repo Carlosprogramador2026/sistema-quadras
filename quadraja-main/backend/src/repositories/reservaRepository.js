@@ -3,6 +3,7 @@ import { prisma } from '../utils/prisma.js';
 const incluirRelacoes = {
   cliente: { select: { id: true, nome: true, telefone: true, email: true } },
   quadra: { select: { id: true, nome: true } },
+  cupom: { select: { id: true, codigo: true, tipo: true, valor: true } },
 };
 
 export const reservaRepository = {
@@ -52,5 +53,13 @@ export const reservaRepository = {
 
   contarPorStatus() {
     return prisma.reserva.groupBy({ by: ['status'], _count: { _all: true } });
+  },
+
+  // Reservas futuras (>= dataApartirDe) geradas por uma recorrencia, num dado status.
+  listarPorRecorrente({ reservaRecorrenteId, statusIn, dataApartirDe }) {
+    return prisma.reserva.findMany({
+      where: { reservaRecorrenteId, status: { in: statusIn }, data: { gte: dataApartirDe } },
+      include: incluirRelacoes,
+    });
   },
 };

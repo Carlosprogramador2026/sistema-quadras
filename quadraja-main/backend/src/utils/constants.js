@@ -24,3 +24,13 @@ export const Role = {
   CLIENTE: 'CLIENTE',
   GESTOR: 'GESTOR',
 };
+
+// Tipos de desconto de um Cupom (SQLite nao tem enum nativo).
+export const TipoCupom = {
+  PERCENTUAL: 'PERCENTUAL',
+  FIXO: 'FIXO',
+};
+
+// Quantas ocorrencias futuras sao materializadas ao criar uma reserva recorrente.
+// Sem infra de cron/scheduler no projeto, essa e a "janela" garantida de uma vez.
+export const OCORRENCIAS_RECORRENCIA = 8;

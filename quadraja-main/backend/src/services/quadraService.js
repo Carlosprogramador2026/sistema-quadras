@@ -12,8 +12,8 @@ export const quadraService = {
     return quadra;
   },
 
-  criar({ nome, ativa = true }) {
-    return quadraRepository.criar({ nome, ativa });
+  criar({ nome, ativa = true, valorHora = 0 }) {
+    return quadraRepository.criar({ nome, ativa, valorHora });
   },
 
   async atualizar(id, dados) {

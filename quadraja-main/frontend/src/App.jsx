@@ -9,11 +9,15 @@ import { LoginGestor } from './features/auth/LoginGestor.jsx';
 
 import { Horarios } from './features/cliente/Horarios.jsx';
 import { MinhasReservas } from './features/cliente/MinhasReservas.jsx';
+import { Recorrentes } from './features/cliente/Recorrentes.jsx';
 
 import { Dashboard } from './features/admin/Dashboard.jsx';
 import { Pendencias } from './features/admin/Pendencias.jsx';
 import { VisaoGeral } from './features/admin/VisaoGeral.jsx';
 import { Quadras } from './features/admin/Quadras.jsx';
+import { Cupons } from './features/admin/Cupons.jsx';
+
+import { ReservaDetalhe } from './features/reserva/ReservaDetalhe.jsx';
 
 const cliente = (el) => (
   <RequireAuth role="CLIENTE">
@@ -38,12 +42,16 @@ export default function App() {
       {/* Cliente */}
       <Route path="/" element={cliente(<Horarios />)} />
       <Route path="/minhas-reservas" element={cliente(<MinhasReservas />)} />
+      <Route path="/minhas-reservas/:id" element={cliente(<ReservaDetalhe />)} />
+      <Route path="/recorrentes" element={cliente(<Recorrentes />)} />
 
       {/* Gestor */}
       <Route path="/admin" element={gestor(<Dashboard />)} />
       <Route path="/admin/pendencias" element={gestor(<Pendencias />)} />
       <Route path="/admin/visao-geral" element={gestor(<VisaoGeral />)} />
       <Route path="/admin/quadras" element={gestor(<Quadras />)} />
+      <Route path="/admin/cupons" element={gestor(<Cupons />)} />
+      <Route path="/admin/reservas/:id" element={gestor(<ReservaDetalhe />)} />
 
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>

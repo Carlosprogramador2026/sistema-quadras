@@ -15,6 +15,22 @@ export function formatarDataCurta(data) {
   return dayjs(data).format('DD/MM/YYYY');
 }
 
+const formatadorMoeda = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' });
+
+export function formatarMoeda(valor) {
+  return formatadorMoeda.format(valor || 0);
+}
+
+export const DIAS_SEMANA = [
+  'Domingo',
+  'Segunda-feira',
+  'Terça-feira',
+  'Quarta-feira',
+  'Quinta-feira',
+  'Sexta-feira',
+  'Sábado',
+];
+
 // Metadados visuais de cada status de reserva.
 export const STATUS_META = {
   PENDENTE: { label: 'Pendente', badge: 'amber' },
