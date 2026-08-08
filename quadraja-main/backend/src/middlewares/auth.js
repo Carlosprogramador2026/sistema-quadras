@@ -34,3 +34,20 @@ export function requireCliente(req, _res, next) {
   }
   next();
 }
+
+// Popula req.user se vier um Bearer token valido, mas nunca bloqueia a
+// requisicao. Usado em rotas publicas que tem um "extra" para usuarios
+// autenticados (ex: gestor ver quadras inativas).
+export function optionalAuth(req, _res, next) {
+  const header = req.headers.authorization || '';
+  const [scheme, token] = header.split(' ');
+
+  if (scheme === 'Bearer' && token) {
+    try {
+      req.user = verifyToken(token);
+    } catch {
+      // Token invalido/expirado: segue sem usuario autenticado.
+    }
+  }
+  next();
+}

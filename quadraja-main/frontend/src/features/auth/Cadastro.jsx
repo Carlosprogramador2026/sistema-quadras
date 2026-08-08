@@ -54,7 +54,7 @@ export function Cadastro() {
           <Input id="email" name="email" type="email" autoComplete="email" required value={form.email} onChange={onChange} placeholder="voce@email.com" />
         </Field>
         <Field label="Senha" htmlFor="senha">
-          <Input id="senha" name="senha" type="password" autoComplete="new-password" required minLength={6} value={form.senha} onChange={onChange} placeholder="mínimo 6 caracteres" />
+          <Input id="senha" name="senha" type="password" autoComplete="new-password" required minLength={8} value={form.senha} onChange={onChange} placeholder="mínimo 8 caracteres" />
         </Field>
         <Button type="submit" size="lg" loading={loading} className="w-full">
           Criar conta

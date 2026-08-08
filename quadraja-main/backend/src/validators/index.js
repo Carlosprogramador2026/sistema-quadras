@@ -19,7 +19,7 @@ export const cadastroClienteSchema = {
     nome: z.string().min(2, 'Nome muito curto.'),
     telefone: z.string().min(8, 'Telefone invalido.'),
     email: z.string().email('E-mail invalido.'),
-    senha: z.string().min(6, 'Senha deve ter ao menos 6 caracteres.'),
+    senha: z.string().min(8, 'Senha deve ter ao menos 8 caracteres.'),
   }),
 };
 

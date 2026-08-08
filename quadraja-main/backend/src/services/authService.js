@@ -10,6 +10,15 @@ function semSenha(usuario) {
   return rest;
 }
 
+// Hash "fantasma" usado quando o usuario nao existe, para que o bcrypt.compare
+// sempre rode e o tempo de resposta nao denuncie (por timing) se o e-mail
+// esta ou nao cadastrado.
+const HASH_FANTASMA = bcrypt.hashSync('senha-fantasma-normaliza-tempo-de-resposta', 10);
+
+function compararSenha(senha, hashArmazenado) {
+  return bcrypt.compare(senha, hashArmazenado || HASH_FANTASMA);
+}
+
 export const authService = {
   async cadastrarCliente({ nome, telefone, email, senha }) {
     const hash = await bcrypt.hash(senha, 10);
@@ -20,7 +29,8 @@ export const authService = {
 
   async loginCliente({ email, senha }) {
     const cliente = await clienteRepository.buscarPorEmail(email);
-    if (!cliente || !(await bcrypt.compare(senha, cliente.senha))) {
+    const senhaOk = await compararSenha(senha, cliente?.senha);
+    if (!cliente || !senhaOk) {
       throw new AppError('E-mail ou senha invalidos.', 401);
     }
     const token = signToken({ id: cliente.id, role: Role.CLIENTE, nome: cliente.nome });
@@ -29,7 +39,8 @@ export const authService = {
 
   async loginGestor({ email, senha }) {
     const gestor = await gestorRepository.buscarPorEmail(email);
-    if (!gestor || !(await bcrypt.compare(senha, gestor.senha))) {
+    const senhaOk = await compararSenha(senha, gestor?.senha);
+    if (!gestor || !senhaOk) {
       throw new AppError('E-mail ou senha invalidos.', 401);
     }
     const token = signToken({ id: gestor.id, role: Role.GESTOR, nome: gestor.nome });
